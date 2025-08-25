@@ -10,9 +10,7 @@ export default async function handler(req, res) {
     const discordRes = await fetch(
       `https://discord.com/api/v10/channels/${channelId}/messages?limit=10`,
       {
-        headers: {
-          Authorization: `Bot ${token}`,
-        },
+        headers: { Authorization: `Bot ${token}` },
       }
     );
 
@@ -35,16 +33,13 @@ export default async function handler(req, res) {
         })) || []
       };
 
-      // Flatten all fields from embeds
+      // Flatten all embed fields
       if (m.embeds && m.embeds.length > 0) {
-        m.embeds.forEach(e => {
-          // Include description if exists
-          if (e.description) {
-            result.description = e.description;
-          }
+        m.embeds.forEach(embed => {
+          if (embed.description) result.description = embed.description;
 
-          if (e.fields && Array.isArray(e.fields)) {
-            e.fields.forEach(field => {
+          if (embed.fields && Array.isArray(embed.fields)) {
+            embed.fields.forEach(field => {
               const key = field.name
                 .replace(/[^\w\s]/g, '')
                 .trim()
