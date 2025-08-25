@@ -1,86 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Brainrot Notifier</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brainrot Feed</title>
   <style>
     body {
-      background: #2f3136;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      color: #dcddde;
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
       display: flex;
       justify-content: center;
-      padding: 30px;
+      padding: 20px;
+    }
+    #feed {
+      width: 600px;
+      max-width: 95%;
     }
     .card {
-      background: #36393f;
-      border-left: 5px solid #5865f2;
-      border-radius: 8px;
-      padding: 16px;
-      width: 500px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      background: #161b22;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
     }
-    .title {
-      font-size: 18px;
+    .author {
       font-weight: bold;
-      color: white;
-      margin-bottom: 8px;
+      color: #58a6ff;
     }
-    .field {
-      margin-top: 10px;
-      padding: 8px;
-      background: #2f3136;
-      border-radius: 5px;
-    }
-    .field-name {
-      font-weight: bold;
-      margin-bottom: 4px;
-      color: #b9bbbe;
-    }
-    .field-value {
-      white-space: pre-wrap;
-    }
-    .footer {
-      margin-top: 12px;
-      font-size: 12px;
-      color: #72767d;
-      text-align: right;
+    .time {
+      font-size: 0.8em;
+      color: #8b949e;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="title">📢 Brainrot Notifier</div>
-    <div id="fields"></div>
-    <div class="footer">Auto-updating feed</div>
+  <div id="feed">
+    <h2>🐀 Brainrot Live Feed</h2>
+    <div id="messages">Loading...</div>
   </div>
 
   <script>
-    async function update() {
+    async function fetchFeed() {
       try {
         const res = await fetch("/api/feed");
         const data = await res.json();
 
-        const fieldsContainer = document.getElementById("fields");
-        fieldsContainer.innerHTML = "";
+        const container = document.getElementById("messages");
+        container.innerHTML = "";
 
-        Object.entries(data).forEach(([key, value]) => {
-          const field = document.createElement("div");
-          field.className = "field";
-
-          field.innerHTML = `
-            <div class="field-name">${key}</div>
-            <div class="field-value">${value}</div>
+        data.forEach(msg => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="author">${msg.author}</div>
+            <div class="content">${msg.content}</div>
+            <div class="time">${new Date(msg.timestamp).toLocaleString()}</div>
           `;
-          fieldsContainer.appendChild(field);
+          container.appendChild(card);
         });
-      } catch (e) {
-        console.error("Failed to update:", e);
+      } catch (err) {
+        document.getElementById("messages").innerText = "❌ Failed to load feed.";
       }
     }
 
-    setInterval(update, 3000); // update every 3s
-    update();
+    // Fetch immediately and every 5s
+    fetchFeed();
+    setInterval(fetchFeed, 5000);
   </script>
 </body>
 </html>
