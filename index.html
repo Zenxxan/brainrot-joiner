@@ -1,72 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Brainrot Feed</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d1117;
-      color: #c9d1d9;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-    #feed {
-      width: 600px;
-      max-width: 95%;
-    }
-    .card {
-      background: #161b22;
-      padding: 15px;
-      margin-bottom: 10px;
-      border-radius: 10px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.4);
-    }
-    .author {
-      font-weight: bold;
-      color: #58a6ff;
-    }
-    .time {
-      font-size: 0.8em;
-      color: #8b949e;
-    }
-  </style>
 </head>
 <body>
-  <div id="feed">
-    <h2>🐀 Brainrot Live Feed</h2>
-    <div id="messages">Loading...</div>
-  </div>
+  <h1>Brainrot Feed</h1>
+  <ul id="feed"></ul>
 
   <script>
-    async function fetchFeed() {
-      try {
-        const res = await fetch("/api/feed");
-        const data = await res.json();
+    async function loadFeed() {
+      const res = await fetch('/api/feed');
+      const data = await res.json();
 
-        const container = document.getElementById("messages");
-        container.innerHTML = "";
+      const feed = document.getElementById('feed');
+      feed.innerHTML = '';
 
-        data.forEach(msg => {
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <div class="author">${msg.author}</div>
-            <div class="content">${msg.content}</div>
-            <div class="time">${new Date(msg.timestamp).toLocaleString()}</div>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        document.getElementById("messages").innerText = "❌ Failed to load feed.";
-      }
+      data.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <b>${item.author}</b>: ${item.content} <br>
+          <small>${new Date(item.timestamp).toLocaleString()}</small>
+        `;
+        feed.appendChild(li);
+      });
     }
 
-    // Fetch immediately and every 5s
-    fetchFeed();
-    setInterval(fetchFeed, 5000);
+    loadFeed();
+    setInterval(loadFeed, 5000); // auto-refresh every 5s
   </script>
 </body>
 </html>
