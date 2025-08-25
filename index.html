@@ -1,9 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Brainrot Notifier</title>
+  <style>
+    body {
+      background: #2f3136;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #dcddde;
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+    }
+    .card {
+      background: #36393f;
+      border-left: 5px solid #5865f2;
+      border-radius: 8px;
+      padding: 16px;
+      width: 500px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 8px;
+    }
+    .field {
+      margin-top: 10px;
+      padding: 8px;
+      background: #2f3136;
+      border-radius: 5px;
+    }
+    .field-name {
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #b9bbbe;
+    }
+    .field-value {
+      white-space: pre-wrap;
+    }
+    .footer {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #72767d;
+      text-align: right;
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello Steal A Brainrot Notifier.🚀</h1>
+  <div class="card">
+    <div class="title">📢 Brainrot Notifier</div>
+    <div id="fields"></div>
+    <div class="footer">Auto-updating feed</div>
+  </div>
+
+  <script>
+    async function update() {
+      try {
+        const res = await fetch("/api/feed");
+        const data = await res.json();
+
+        const fieldsContainer = document.getElementById("fields");
+        fieldsContainer.innerHTML = "";
+
+        Object.entries(data).forEach(([key, value]) => {
+          const field = document.createElement("div");
+          field.className = "field";
+
+          field.innerHTML = `
+            <div class="field-name">${key}</div>
+            <div class="field-value">${value}</div>
+          `;
+          fieldsContainer.appendChild(field);
+        });
+      } catch (e) {
+        console.error("Failed to update:", e);
+      }
+    }
+
+    setInterval(update, 3000); // update every 3s
+    update();
+  </script>
 </body>
 </html>
