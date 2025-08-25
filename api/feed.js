@@ -27,26 +27,22 @@ export default async function handler(req, res) {
       const result = {
         id: m.id,
         author: m.author?.username || null,
-        content: m.content || null, // still might be empty for embed-only messages
         timestamp: m.timestamp,
         attachments: m.attachments?.map(a => ({
           url: a.url,
           name: a.filename,
           contentType: a.content_type
-        })) || [],
-        embeds: [],
-        rawEmbeds: m.embeds || []
+        })) || []
       };
 
+      // Flatten all fields from embeds
       if (m.embeds && m.embeds.length > 0) {
-        result.embeds = m.embeds.map(e => {
-          const embedObj = {
-            title: e.title || null,
-            description: e.description || null,
-            fields: {}
-          };
+        m.embeds.forEach(e => {
+          // Include description if exists
+          if (e.description) {
+            result.description = e.description;
+          }
 
-          // Flatten fields into top-level keys
           if (e.fields && Array.isArray(e.fields)) {
             e.fields.forEach(field => {
               const key = field.name
@@ -54,17 +50,9 @@ export default async function handler(req, res) {
                 .trim()
                 .replace(/\s+/g, '_')
                 .toLowerCase();
-              embedObj.fields[key] = field.value;
-              result[key] = field.value; // also flatten to top-level for easy access
+              result[key] = field.value;
             });
           }
-
-          // Include description as a field if present
-          if (e.description) {
-            result.description = e.description;
-          }
-
-          return embedObj;
         });
       }
 
