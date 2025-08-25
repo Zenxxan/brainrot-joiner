@@ -23,12 +23,39 @@ export default async function handler(req, res) {
 
     const messages = await discordRes.json();
 
-    const simplified = messages.map(m => ({
-      id: m.id,
-      author: m.author.username,
-      content: m.content,
-      timestamp: m.timestamp
-    }));
+    const simplified = messages.map(m => {
+      // default values
+      let result = {
+        id: m.id,
+        author: m.author?.username,
+        content: m.content || null,
+        timestamp: m.timestamp,
+      };
+
+      // if there's an embed, flatten its fields
+      if (m.embeds && m.embeds.length > 0) {
+        const e = m.embeds[0];
+
+        // copy over title/description
+        if (e.title) result.title = e.title;
+        if (e.description) result.description = e.description;
+
+        // flatten fields into key/value pairs
+        if (e.fields && Array.isArray(e.fields)) {
+          e.fields.forEach(field => {
+            // turn "🐾 Brainrot Name" into "brainrotName"
+            const key = field.name
+              .replace(/[^\w\s]/g, '') // remove emoji/symbols
+              .trim()
+              .replace(/\s+/g, '_')   // replace spaces with _
+              .toLowerCase();
+            result[key] = field.value;
+          });
+        }
+      }
+
+      return result;
+    });
 
     res.status(200).json(simplified);
   } catch (err) {
