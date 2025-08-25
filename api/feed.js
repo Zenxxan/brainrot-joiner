@@ -1,41 +1,36 @@
 export default async function handler(req, res) {
-  const channelId = process.env.DISCORD_CHANNEL_ID;
-  const botToken = process.env.DISCORD_BOT_TOKEN;
-
-  if (!channelId || !botToken) {
-    return res.status(500).json({ error: "Missing Discord credentials" });
-  }
-
   try {
-    // Fetch last 10 messages from Discord
-    const response = await fetch(
-      `https://discord.com/api/v10/channels/${channelId}/messages?limit=10`,
-      {
-        headers: {
-          Authorization: `Bot ${botToken}`,
-        },
+    const response = await fetch(`https://discord.com/api/v10/channels/${process.env.CHANNEL_ID}/messages`, {
+      headers: {
+        Authorization: `Bot ${process.env.BOT_TOKEN}`
       }
-    );
+    });
+
+    const data = await response.json();
 
     if (!response.ok) {
-      const errorText = await response.text();
-      return res
-        .status(response.status)
-        .json({ error: "Discord API error", details: errorText });
+      return res.status(500).json({ error: "Discord API error", details: data });
     }
 
-    const messages = await response.json();
+    const messages = data.map(m => {
+      let text = m.content;
 
-    // Map messages into a simpler format
-    const simplified = messages.map((msg) => ({
-      id: msg.id,
-      author: msg.author.username,
-      content: msg.content,
-      timestamp: msg.timestamp,
-    }));
+      // If there's an embed, use its description or title
+      if (!text && m.embeds && m.embeds.length > 0) {
+        const embed = m.embeds[0];
+        text = embed.description || embed.title || "[embed with no text]";
+      }
 
-    res.status(200).json(simplified);
+      return {
+        id: m.id,
+        author: m.author.username,
+        content: text,
+        timestamp: m.timestamp
+      };
+    });
+
+    res.status(200).json(messages);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Server error", details: err.message });
   }
 }
