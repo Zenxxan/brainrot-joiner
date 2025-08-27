@@ -11,7 +11,6 @@
     const placeId = urlParams.get('placeId');
     const gameInstanceId = urlParams.get('gameInstanceId');
     if (placeId && gameInstanceId) {
-      // Redirect to the roblox protocol link
       window.location.href = `roblox://experiences/start?placeId=${placeId}&gameInstanceId=${gameInstanceId}`;
     } else {
       document.body.innerHTML = '<h3>Error: Missing placeId or gameInstanceId.</h3>';
