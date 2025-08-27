@@ -1,32 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Brainrot Feed</title>
+  <meta charset="UTF-8" />
+  <title>Roblox Join Redirect</title>
 </head>
 <body>
-  <h1>Brainrot Feed</h1>
-  <ul id="feed"></ul>
-
+  <h2>Join Roblox Games</h2>
   <script>
-    async function loadFeed() {
-      const res = await fetch('/api/feed');
-      const data = await res.json();
-
-      const feed = document.getElementById('feed');
-      feed.innerHTML = '';
-
-      data.forEach(item => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <b>${item.author}</b>: ${item.content} <br>
-          <small>${new Date(item.timestamp).toLocaleString()}</small>
-        `;
-        feed.appendChild(li);
-      });
+    const urlParams = new URLSearchParams(window.location.search);
+    const placeId = urlParams.get('placeId');
+    const gameInstanceId = urlParams.get('gameInstanceId');
+    if (placeId && gameInstanceId) {
+      // Redirect to the roblox protocol link
+      window.location.href = `roblox://experiences/start?placeId=${placeId}&gameInstanceId=${gameInstanceId}`;
+    } else {
+      document.body.innerHTML = '<h3>Error: Missing placeId or gameInstanceId.</h3>';
     }
-
-    loadFeed();
-    setInterval(loadFeed, 5000); // auto-refresh every 5s
   </script>
 </body>
 </html>
