@@ -10,10 +10,10 @@
     const urlParams = new URLSearchParams(window.location.search);
     const placeId = urlParams.get('placeId');
     const gameInstanceId = urlParams.get('gameInstanceId');
-    const code = urlParams.get('code'); // ADDED: Private server support
+    const code = urlParams.get('code'); // Private server support
     
     if (code) {
-      window.location.href = `https://www.roblox.com/share?code=${code}&type=Server`;
+      window.location.href = `https://www.roblox.com/share-links?code=${code}&type=Server&pid=Server&is_retargeting=false&deep_link_value=roblox%3A%2F%2Fnavigation%2Fshare_links%3Fcode%3D${code}%26type%3DServer`;
     }
     else if (placeId && gameInstanceId) {
       window.location.href = `roblox://experiences/start?placeId=${placeId}&gameInstanceId=${gameInstanceId}`;
