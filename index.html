@@ -10,7 +10,12 @@
     const urlParams = new URLSearchParams(window.location.search);
     const placeId = urlParams.get('placeId');
     const gameInstanceId = urlParams.get('gameInstanceId');
-    if (placeId && gameInstanceId) {
+    const code = urlParams.get('code'); // ADDED: Private server support
+    
+    if (code) {
+      window.location.href = `https://www.roblox.com/share?code=${code}&type=Server`;
+    }
+    else if (placeId && gameInstanceId) {
       window.location.href = `roblox://experiences/start?placeId=${placeId}&gameInstanceId=${gameInstanceId}`;
     } else {
       document.body.innerHTML = '<h3>Error: Missing placeId or gameInstanceId.</h3>';
